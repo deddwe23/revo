@@ -1,50 +1,24 @@
-import { useEffect, useState, useRef, type MouseEvent } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useMemo, useCallback, type MouseEvent } from "react";
+import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Search, Plus, SlidersHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { addToCart } from "@/lib/cart";
 import { products, categories } from "@/data/products";
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.96 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
-      delay: i * 0.06,
-    },
-  }),
-};
-
 function ServiceCard({
   product,
-  index,
   onAddToCart,
 }: {
   product: (typeof products)[0];
-  index: number;
   onAddToCart: (
     product: (typeof products)[0],
     event: MouseEvent<HTMLButtonElement>,
   ) => void;
 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-
   return (
-    <motion.div
-      ref={ref}
-      custom={index}
-      variants={itemVariants}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      className="h-full"
-    >
-      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-[0_30px_90px_rgba(0,0,0,0.25)]">
+    <div className="h-full">
+      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-[0_30px_90px_rgba(0,0,0,0.25)] transition-transform duration-300 hover:-translate-y-1">
         <Link
           href={`/products/${product.id}`}
           className="group flex-1 flex flex-col"
@@ -83,13 +57,13 @@ function ServiceCard({
           <button
             type="button"
             onClick={(e) => onAddToCart(product, e)}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-primary to-secondary py-3 text-sm font-bold text-white shadow-xl shadow-primary/20"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-primary to-secondary py-3 text-sm font-bold text-white shadow-xl shadow-primary/20 transition-transform duration-200 hover:scale-[1.01]"
           >
             <Plus className="w-4 h-4" /> إضافة للسلة
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -109,21 +83,26 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("featured");
 
-  const filtered = products
-    .filter((p) => {
-      const matchCat =
-        activeCategory === "all" || p.category === activeCategory;
-      const matchSearch =
-        p.name.includes(searchQuery) ||
-        p.nameEn.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCat && matchSearch;
-    })
-    .sort((a, b) => {
-      if (sortBy === "price-asc") return a.price - b.price;
-      if (sortBy === "price-desc") return b.price - a.price;
-      if (sortBy === "rating") return b.rating - a.rating;
-      return 0;
-    });
+  const filtered = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return products
+      .filter((p) => {
+        const matchCat =
+          activeCategory === "all" || p.category === activeCategory;
+        const matchSearch =
+          normalizedSearch.length === 0 ||
+          p.name.toLowerCase().includes(normalizedSearch) ||
+          p.nameEn.toLowerCase().includes(normalizedSearch);
+        return matchCat && matchSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === "price-asc") return a.price - b.price;
+        if (sortBy === "price-desc") return b.price - a.price;
+        if (sortBy === "rating") return b.rating - a.rating;
+        return 0;
+      });
+  }, [activeCategory, searchQuery, sortBy]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -142,21 +121,21 @@ export default function Products() {
 
   const { toast } = useToast();
 
-  const handleAddToCart = (
-    product: (typeof products)[0],
-    event: MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.stopPropagation();
-    event.preventDefault();
-    addToCart({
-      id: String(product.id),
-      name: product.name,
-      subtitle: product.nameEn,
-      priceSar: product.price,
-      currency: "SAR",
-    });
-    toast({ title: "تمت الإضافة إلى السلة", description: product.name });
-  };
+  const handleAddToCart = useCallback(
+    (product: (typeof products)[0], event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      addToCart({
+        id: String(product.id),
+        name: product.name,
+        subtitle: product.nameEn,
+        priceSar: product.price,
+        currency: "SAR",
+      });
+      toast({ title: "تمت الإضافة إلى السلة", description: product.name });
+    },
+    [toast],
+  );
 
   return (
     <div
@@ -317,45 +296,36 @@ export default function Products() {
               : `${filtered.length} خدمة متاحة`}
         </p>
 
-        <AnimatePresence mode="wait">
-          {filtered.length > 0 ? (
-            <motion.div
-              key={`${activeCategory}-${searchQuery}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 xl:grid-cols-3 gap-4"
+        {filtered.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-2 xl:grid-cols-3 gap-4"
+          >
+            {filtered.map((product, i) => (
+              <ServiceCard
+                key={product.id}
+                product={product}
+                onAddToCart={handleAddToCart}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <div className="text-center py-24">
+            <p className="text-white/15 text-7xl font-mono mb-4">∅</p>
+            <p className="text-white/30 font-semibold">لا توجد نتائج</p>
+            <button
+              onClick={() => {
+                setActiveCategory("all");
+                setSearchQuery("");
+              }}
+              className="mt-4 text-violet-400/60 hover:text-violet-400 text-xs font-mono transition-colors"
             >
-              {filtered.map((product, i) => (
-                <ServiceCard
-                  key={product.id}
-                  product={product}
-                  index={i}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-24"
-            >
-              <p className="text-white/15 text-7xl font-mono mb-4">∅</p>
-              <p className="text-white/30 font-semibold">لا توجد نتائج</p>
-              <button
-                onClick={() => {
-                  setActiveCategory("all");
-                  setSearchQuery("");
-                }}
-                className="mt-4 text-violet-400/60 hover:text-violet-400 text-xs font-mono transition-colors"
-              >
-                مسح الفلاتر
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              مسح الفلاتر
+            </button>
+          </div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
