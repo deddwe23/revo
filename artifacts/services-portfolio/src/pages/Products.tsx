@@ -18,39 +18,42 @@ const ServiceCard = memo(function ServiceCard({
   return (
     <div className="h-full">
       <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-2xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
-        <Link
-          href={`/products/${product.id}`}
-          className="group flex-1 flex flex-col"
-        >
-          <div
-            className={`relative aspect-square w-full bg-gradient-to-br ${product.gradient} flex items-center justify-center text-5xl text-white`}
+        <div className="group flex-1 flex flex-col">
+          <Link
+            href={`/products/${product.id}`}
+            className="group flex-1 flex flex-col no-underline"
+            aria-label={`عرض تفاصيل ${product.name}`}
           >
-            <span className="text-6xl">{product.icon}</span>
-          </div>
-
-          <div className="px-5 py-6 flex flex-col gap-3 flex-1">
-            <div>
-              <h3 className="text-white font-black text-lg leading-tight mb-1">
-                {product.name}
-              </h3>
-              <p className="text-white/40 text-xs">{product.nameEn}</p>
+            <div
+              className={`relative aspect-square w-full bg-gradient-to-br ${product.gradient} flex items-center justify-center text-5xl text-white`}
+            >
+              <span className="text-6xl">{product.icon}</span>
             </div>
 
-            <div className="mt-auto">
-              <div className="flex items-end gap-2">
-                <span className="text-2xl font-black text-white">
-                  {product.price.toLocaleString("ar")}
-                </span>
-                <span className="text-white/40 text-xs">ر.س</span>
+            <div className="px-5 py-6 flex flex-col gap-3 flex-1">
+              <div>
+                <h3 className="text-white font-black text-lg leading-tight mb-1">
+                  {product.name}
+                </h3>
+                <p className="text-white/40 text-xs">{product.nameEn}</p>
               </div>
-              {product.originalPrice && (
-                <p className="text-white/25 text-xs line-through mt-1">
-                  {product.originalPrice.toLocaleString("ar")} ر.س
-                </p>
-              )}
+
+              <div className="mt-auto">
+                <div className="flex items-end gap-2">
+                  <span className="text-2xl font-black text-white">
+                    {product.price.toLocaleString("ar")}
+                  </span>
+                  <span className="text-white/40 text-xs">ر.س</span>
+                </div>
+                {product.originalPrice && (
+                  <p className="text-white/25 text-xs line-through mt-1">
+                    {product.originalPrice.toLocaleString("ar")} ر.س
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
 
         <div className="p-5 border-t border-white/10 bg-[hsl(270,52%,9%)]">
           <button
@@ -157,6 +160,16 @@ export default function Products() {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-10">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/"
+              className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              ← العودة للصفحة الرئيسية
+            </Link>
+            <span className="text-white/40 text-xs">صفحة المنتجات</span>
+          </div>
+
           <p className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]">
             Digital Services
           </p>
