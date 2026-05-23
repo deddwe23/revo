@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, memo, type MouseEvent } from "react";
 import { Link } from "wouter";
 import { Search, Plus, SlidersHorizontal } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { addToCart } from "@/lib/cart";
 import { products, categories } from "@/data/products";
@@ -70,6 +71,7 @@ const ServiceCard = memo(function ServiceCard({
 });
 
 export default function Products() {
+  const isMobile = useIsMobile();
   const [activeCategory, setActiveCategory] = useState(() => {
     if (typeof window === "undefined") return "all";
 
@@ -144,19 +146,21 @@ export default function Products() {
       className="min-h-screen bg-[#0D0416] relative overflow-x-hidden"
       dir="rtl"
     >
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
-      </div>
+      {!isMobile && (
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-[0.02]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+        </div>
+      )}
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-10">
@@ -185,17 +189,17 @@ export default function Products() {
             حلول تقنية وإبداعية متكاملة تصنع الفرق وتبني علامتك في العالم الرقمي
           </p>
 
-          <div className="flex justify-center gap-8 sm:gap-14">
+          <div className={`flex flex-wrap justify-center ${isMobile ? "gap-3" : "gap-8 sm:gap-14"}`}>
             {[
               { val: "+50", label: "خدمة متاحة" },
               { val: "+2K", label: "عميل سعيد" },
               { val: "4.9★", label: "تقييم" },
             ].map((s, i) => (
               <div key={i} className="text-center">
-                <p className="text-white font-black text-2xl sm:text-3xl">
+                <p className={`text-white font-black ${isMobile ? "text-xl" : "text-2xl sm:text-3xl"}`}>
                   {s.val}
                 </p>
-                <p className="text-white/30 text-xs mt-0.5">{s.label}</p>
+                <p className="text-white/30 text-[11px] mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -207,7 +211,7 @@ export default function Products() {
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
 
-        <div className="flex gap-3 mb-5 max-w-2xl mx-auto">
+        <div className={`flex flex-col ${isMobile ? "gap-3" : "gap-3"} mb-5 max-w-2xl mx-auto ${isMobile ? "px-0" : ""}`}>
           <div className="relative flex-1">
             <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
             <input
@@ -218,7 +222,7 @@ export default function Products() {
               className="w-full bg-white/5 border border-white/10 rounded-xl pr-10 pl-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-violet-500/5 transition-all"
             />
           </div>
-          <div className="relative">
+          <div className={`relative ${isMobile ? "w-full" : ""}`}>
             <SlidersHorizontal className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
             <select
               value={sortBy}
@@ -269,7 +273,7 @@ export default function Products() {
         </p>
 
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map((product, i) => (
               <ServiceCard
                 key={product.id}
@@ -296,7 +300,9 @@ export default function Products() {
 
         <div className="mt-20 text-center">
           <div className="inline-block relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-500/20 to-violet-600/20 rounded-2xl blur-xl" />
+            {!isMobile && (
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-500/20 to-violet-600/20 rounded-2xl blur-xl" />
+            )}
             <div className="relative bg-white/5 border border-white/10 rounded-2xl px-8 py-8">
               <p className="text-white/40 text-xs font-mono mb-2 tracking-widest uppercase">
                 خدمة مخصصة
