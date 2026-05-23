@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "wouter";
 import { Star, Search, Zap, Clock, ArrowUpRight, SlidersHorizontal } from "lucide-react";
@@ -16,16 +16,22 @@ const itemVariants = {
 };
 
 function ServiceCard({ product, index }: { product: (typeof products)[0]; index: number }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const ref = useRef<HTMLDivElement | null>(null);
+  // Show content immediately after mount to avoid re-triggering on scroll
+  const [mounted, setMounted] = useState(false);
   const [hovered, setHovered] = useState(false);
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    // ensure animations run only once on mount
+    setMounted(true);
+  }, []);
 
   return (
     <motion.div
       ref={ref}
       {...(!isMobile
-        ? { custom: index, variants: itemVariants, initial: "hidden", animate: inView ? "visible" : "hidden" }
+        ? { custom: index, variants: itemVariants, initial: "hidden", animate: mounted ? "visible" : "hidden" }
         : {})}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
@@ -43,7 +49,7 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
           )}
 
           {/* Card */}
-          <div className={`relative h-full rounded-[2rem] bg-[hsl(270,50%,7%)] border border-white/10 overflow-hidden ${!isMobile ? "backdrop-blur-sm" : ""} shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:-translate-y-1`}>
+          <div className={`relative h-full rounded-[2rem] bg-[hsl(270,50%,7%)] border border-white/10 overflow-hidden ${!isMobile ? "backdrop-blur-sm" : ""} ${!isMobile ? 'shadow-[0_25px_80px_rgba(0,0,0,0.25)]' : ''} transition-transform duration-300 group-hover:-translate-y-1`}>
             {/* Top Bar Gradient */}
             <div className={`h-0.5 w-full bg-gradient-to-r ${product.gradient}`} />
 
@@ -53,12 +59,12 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
                   <motion.div
                     animate={{ rotate: hovered ? 360 : 0 }}
                     transition={{ duration: 0.8, ease: "easeInOut" }}
-                    className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl shadow-lg`}
+                    className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl ${!isMobile ? 'shadow-lg' : ''}`}
                   >
                     {product.icon}
                   </motion.div>
                 ) : (
-                  <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl shadow-lg`}>
+                  <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl ${!isMobile ? 'shadow-lg' : ''}`}>
                     {product.icon}
                   </div>
                 )}
@@ -130,12 +136,12 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
                   <motion.div
                     animate={{ x: hovered ? 2 : 0, y: hovered ? -2 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center shadow-lg`}
+                    className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center ${!isMobile ? 'shadow-lg' : ''}`}
                   >
                     <ArrowUpRight className="w-4 h-4 text-white" />
                   </motion.div>
                 ) : (
-                  <div className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center shadow-lg`}>
+                  <div className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center ${!isMobile ? 'shadow-lg' : ''}`}>
                     <ArrowUpRight className="w-4 h-4 text-white" />
                   </div>
                 )}
@@ -198,51 +204,71 @@ export default function Products() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-10">
 
         {/* ─── Hero Header ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-10"
-        >
-          {/* Label */}
-          <motion.p
-            initial={{ opacity: 0, letterSpacing: "0.2em" }}
-            animate={{ opacity: 1, letterSpacing: "0.35em" }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]"
+        {!isMobile ? (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-10"
           >
+        ) : (
+          <div className="text-center mb-10">
+        )}
+          {/* Label */}
+            {!isMobile ? (
+              <motion.p
+                initial={{ opacity: 0, letterSpacing: "0.2em" }}
+                animate={{ opacity: 1, letterSpacing: "0.35em" }}
+                transition={{ duration: 0.8, delay: 0.1 }}
+                className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]"
+              >
+            ) : (
+              <p className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]">
+            )}
             Digital Services
-          </motion.p>
+          {!isMobile ? </motion.p> : </p>}
 
           {/* Title */}
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight"
-          >
+          {!isMobile ? (
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight"
+            >
+          ) : (
+            <h1 className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight">
+          )}
             خدماتنا{" "}
             <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-violet-300 bg-clip-text text-transparent">
               الرقمية
             </span>
-          </motion.h1>
+          {!isMobile ? </motion.h1> : </h1>}
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-white/35 text-sm max-w-md mx-auto mb-8"
-          >
+          {!isMobile ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-white/35 text-sm max-w-md mx-auto mb-8"
+            >
+          ) : (
+            <p className="text-white/35 text-sm max-w-md mx-auto mb-8">
+          )}
             حلول تقنية وإبداعية متكاملة تصنع الفرق وتبني علامتك في العالم الرقمي
-          </motion.p>
+          {!isMobile ? </motion.p> : </p>}
 
           {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="flex justify-center gap-8 sm:gap-14"
-          >
+          {!isMobile ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="flex justify-center gap-8 sm:gap-14"
+            >
+          ) : (
+            <div className="flex justify-center gap-8 sm:gap-14">
+          )}
             {[
               { val: "+50", label: "خدمة متاحة" },
               { val: "+2K", label: "عميل سعيد" },
@@ -253,7 +279,7 @@ export default function Products() {
                 <p className="text-white/30 text-xs mt-0.5">{s.label}</p>
               </div>
             ))}
-          </motion.div>
+          {!isMobile ? </motion.div> : </div>}
         </motion.div>
 
         {/* ─── Divider ─── */}
@@ -264,12 +290,16 @@ export default function Products() {
         </div>
 
         {/* ─── Search + Sort ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="flex gap-3 mb-5 max-w-2xl mx-auto"
-        >
+        {!isMobile ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="flex gap-3 mb-5 max-w-2xl mx-auto"
+          >
+        ) : (
+          <div className="flex gap-3 mb-5 max-w-2xl mx-auto">
+        )}
           <div className="relative flex-1">
             <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
             <input
@@ -293,37 +323,55 @@ export default function Products() {
               <option value="price-desc" className="bg-gray-900">السعر ↓</option>
             </select>
           </div>
-        </motion.div>
+        {!isMobile ? </motion.div> : </div>}
 
         {/* ─── Category Pills – Centered ─── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.32 }}
-          className="flex flex-wrap justify-center gap-2 mb-8"
-        >
-          {categories.map((cat) => (
-            <motion.button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              whileTap={{ scale: 0.94 }}
-              className={`relative px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${
-                activeCategory === cat.id
-                  ? "border-violet-500/50 text-violet-300 bg-violet-500/10"
-                  : "border-white/8 text-white/35 hover:border-white/18 hover:text-white/55"
-              }`}
-            >
-              {activeCategory === cat.id && (
-                <motion.div
-                  layoutId="activePill"
-                  className="absolute inset-0 rounded-full bg-violet-500/10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                />
-              )}
-              <span className="relative">{cat.label}</span>
-            </motion.button>
-          ))}
-        </motion.div>
+        {!isMobile ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.32 }}
+            className="flex flex-wrap justify-center gap-2 mb-8"
+          >
+            {categories.map((cat) => (
+              <motion.button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                whileTap={{ scale: 0.94 }}
+                className={`relative px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${
+                  activeCategory === cat.id
+                    ? "border-violet-500/50 text-violet-300 bg-violet-500/10"
+                    : "border-white/8 text-white/35 hover:border-white/18 hover:text-white/55"
+                }`}
+              >
+                {activeCategory === cat.id && (
+                  <motion.div
+                    layoutId="activePill"
+                    className="absolute inset-0 rounded-full bg-violet-500/10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative">{cat.label}</span>
+              </motion.button>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`relative px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${
+                  activeCategory === cat.id
+                    ? "border-violet-500/50 text-violet-300 bg-violet-500/10"
+                    : "border-white/8 text-white/35"
+                }`}
+              >
+                <span className="relative">{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Count */}
         <p className="text-white/20 text-xs text-center mb-6">
@@ -337,18 +385,26 @@ export default function Products() {
         {/* ─── Products Grid ─── */}
         <AnimatePresence mode="wait">
           {filtered.length > 0 ? (
-            <motion.div
-              key={activeCategory}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-2 gap-4"
-            >
-              {filtered.map((product, i) => (
-                <ServiceCard key={product.id} product={product} index={i} />
-              ))}
-            </motion.div>
+            (!isMobile ? (
+              <motion.div
+                key={activeCategory}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-2 gap-4"
+              >
+                {filtered.map((product, i) => (
+                  <ServiceCard key={product.id} product={product} index={i} />
+                ))}
+              </motion.div>
+            ) : (
+              <div key={activeCategory} className="grid grid-cols-2 gap-4">
+                {filtered.map((product, i) => (
+                  <ServiceCard key={product.id} product={product} index={i} />
+                ))}
+              </div>
+            ))
           ) : (
             <motion.div
               initial={{ opacity: 0 }}
@@ -368,13 +424,17 @@ export default function Products() {
         </AnimatePresence>
 
         {/* ─── Bottom CTA ─── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="mt-20 text-center"
-        >
+        {!isMobile ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="mt-20 text-center"
+          >
+        ) : (
+          <div className="mt-20 text-center">
+        )}
           <div className="inline-block relative">
             <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-500/20 to-violet-600/20 rounded-2xl blur-xl" />
             <div className="relative bg-white/5 border border-white/10 rounded-2xl px-8 py-8">
@@ -383,8 +443,9 @@ export default function Products() {
               <p className="text-white/35 text-sm mb-6 max-w-xs mx-auto">
                 نبني لك حلاً مخصصاً يناسب احتياجاتك تماماً
               </p>
-              <motion.button
-                whileHover={{ scale: 1.04 }}
+                  </button>
+                </div>
+              {!isMobile ? </motion.div> : </div>}
                 whileTap={{ scale: 0.97 }}
                 className="px-7 py-3 bg-gradient-to-r from-violet-600 to-blue-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-violet-600/30"
               >
