@@ -154,6 +154,8 @@ export default function Products() {
   const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("featured");
 
+  const isMobile = useIsMobile();
+
   // Debounce the search input to avoid filtering on every keystroke
   useEffect(() => {
     const id = setTimeout(() => setSearchQuery(searchInput), 220);
@@ -176,20 +178,22 @@ export default function Products() {
 
   return (
     <div className="min-h-screen bg-[#0D0416] relative overflow-x-hidden" dir="rtl">
-      {/* Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.022]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
-      </div>
+      {/* Ambient Background (disabled on mobile) */}
+      {!isMobile && (
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-[120px]" />
+          <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
+          <div
+            className="absolute inset-0 opacity-[0.022]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
+              backgroundSize: "60px 60px",
+            }}
+          />
+        </div>
+      )}
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-10">
 
