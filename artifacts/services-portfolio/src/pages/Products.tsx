@@ -1,12 +1,11 @@
-import { useEffect, useState, useMemo, useCallback, type MouseEvent } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useMemo, useCallback, memo, type MouseEvent } from "react";
 import { Link } from "wouter";
 import { Search, Plus, SlidersHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { addToCart } from "@/lib/cart";
 import { products, categories } from "@/data/products";
 
-function ServiceCard({
+const ServiceCard = memo(function ServiceCard({
   product,
   onAddToCart,
 }: {
@@ -18,7 +17,7 @@ function ServiceCard({
 }) {
   return (
     <div className="h-full">
-      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-[0_30px_90px_rgba(0,0,0,0.25)] transition-transform duration-300 hover:-translate-y-1">
+      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-2xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
         <Link
           href={`/products/${product.id}`}
           className="group flex-1 flex flex-col"
@@ -65,7 +64,7 @@ function ServiceCard({
       </div>
     </div>
   );
-}
+});
 
 export default function Products() {
   const [activeCategory, setActiveCategory] = useState(() => {
@@ -143,62 +142,37 @@ export default function Products() {
       dir="rtl"
     >
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
         <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
         <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
         <div
-          className="absolute inset-0 opacity-[0.022]"
+          className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
+              "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
             backgroundSize: "60px 60px",
           }}
         />
       </div>
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-10"
-        >
-          <motion.p
-            initial={{ opacity: 0, letterSpacing: "0.2em" }}
-            animate={{ opacity: 1, letterSpacing: "0.35em" }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]"
-          >
+        <div className="text-center mb-10">
+          <p className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]">
             Digital Services
-          </motion.p>
+          </p>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight"
-          >
+          <h1 className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight">
             خدماتنا{" "}
             <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-violet-300 bg-clip-text text-transparent">
               الرقمية
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-white/35 text-sm max-w-md mx-auto mb-8"
-          >
+          <p className="text-white/35 text-sm max-w-md mx-auto mb-8">
             حلول تقنية وإبداعية متكاملة تصنع الفرق وتبني علامتك في العالم الرقمي
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="flex justify-center gap-8 sm:gap-14"
-          >
+          <div className="flex justify-center gap-8 sm:gap-14">
             {[
               { val: "+50", label: "خدمة متاحة" },
               { val: "+2K", label: "عميل سعيد" },
@@ -211,8 +185,8 @@ export default function Products() {
                 <p className="text-white/30 text-xs mt-0.5">{s.label}</p>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -220,12 +194,7 @@ export default function Products() {
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="flex gap-3 mb-5 max-w-2xl mx-auto"
-        >
+        <div className="flex gap-3 mb-5 max-w-2xl mx-auto">
           <div className="relative flex-1">
             <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
             <input
@@ -257,19 +226,13 @@ export default function Products() {
               </option>
             </select>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.32 }}
-          className="flex flex-wrap justify-center gap-2 mb-8"
-        >
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
           {categories.map((cat) => (
-            <motion.button
+            <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              whileTap={{ scale: 0.94 }}
               className={`relative px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${
                 activeCategory === cat.id
                   ? "border-violet-500/50 text-violet-300 bg-violet-500/10"
@@ -277,16 +240,12 @@ export default function Products() {
               }`}
             >
               {activeCategory === cat.id && (
-                <motion.div
-                  layoutId="activePill"
-                  className="absolute inset-0 rounded-full bg-violet-500/10"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                />
+                <div className="absolute inset-0 rounded-full bg-violet-500/10" />
               )}
               <span className="relative">{cat.label}</span>
-            </motion.button>
+            </button>
           ))}
-        </motion.div>
+        </div>
 
         <p className="text-white/20 text-xs text-center mb-6">
           {filtered.length === 1
@@ -297,12 +256,7 @@ export default function Products() {
         </p>
 
         {filtered.length > 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
-            className="grid grid-cols-2 xl:grid-cols-3 gap-4"
-          >
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map((product, i) => (
               <ServiceCard
                 key={product.id}
@@ -310,7 +264,7 @@ export default function Products() {
                 onAddToCart={handleAddToCart}
               />
             ))}
-          </motion.div>
+          </div>
         ) : (
           <div className="text-center py-24">
             <p className="text-white/15 text-7xl font-mono mb-4">∅</p>
@@ -327,13 +281,7 @@ export default function Products() {
           </div>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="mt-20 text-center"
-        >
+        <div className="mt-20 text-center">
           <div className="inline-block relative">
             <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-500/20 to-violet-600/20 rounded-2xl blur-xl" />
             <div className="relative bg-white/5 border border-white/10 rounded-2xl px-8 py-8">
@@ -346,16 +294,15 @@ export default function Products() {
               <p className="text-white/35 text-sm mb-6 max-w-xs mx-auto">
                 نبني لك حلاً مخصصاً يناسب احتياجاتك تماماً
               </p>
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                className="px-7 py-3 bg-gradient-to-r from-violet-600 to-blue-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-violet-600/30"
+              <button
+                type="button"
+                className="px-7 py-3 bg-gradient-to-r from-violet-600 to-blue-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-violet-600/30 transition-transform duration-200 hover:scale-[1.02]"
               >
                 تواصل معنا مباشرة
-              </motion.button>
+              </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
