@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "wouter";
 import { Star, Search, Zap, Clock, ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import { products, categories } from "@/data/products";
@@ -18,41 +19,49 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [hovered, setHovered] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <motion.div
       ref={ref}
-      custom={index}
-      variants={itemVariants}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
+      {...(!isMobile
+        ? { custom: index, variants: itemVariants, initial: "hidden", animate: inView ? "visible" : "hidden" }
+        : {})}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       className="h-full"
     >
       <Link href={`/products/${product.id}`}>
         <div className="relative group cursor-pointer h-full">
-          {/* Glow effect */}
-          <motion.div
-            animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.85 }}
-            transition={{ duration: 0.4 }}
-            className={`absolute -inset-px rounded-2xl bg-gradient-to-br ${product.gradient} opacity-40 blur-sm`}
-          />
+          {/* Glow effect (disabled on mobile to save GPU) */}
+          {!isMobile && (
+            <motion.div
+              animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.85 }}
+              transition={{ duration: 0.4 }}
+              className={`absolute -inset-px rounded-2xl bg-gradient-to-br ${product.gradient} opacity-40 blur-sm`}
+            />
+          )}
 
           {/* Card */}
-          <div className="relative h-full rounded-[2rem] bg-[hsl(270,50%,7%)] border border-white/10 overflow-hidden backdrop-blur-sm shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:-translate-y-1">
+          <div className={`relative h-full rounded-[2rem] bg-[hsl(270,50%,7%)] border border-white/10 overflow-hidden ${!isMobile ? "backdrop-blur-sm" : ""} shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:-translate-y-1`}>
             {/* Top Bar Gradient */}
             <div className={`h-0.5 w-full bg-gradient-to-r ${product.gradient}`} />
 
             <div className="p-4 sm:p-5 flex flex-col h-full gap-4 items-center text-center">
               <div className="flex flex-col items-center gap-4 w-full">
-                <motion.div
-                  animate={{ rotate: hovered ? 360 : 0 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl shadow-lg`}
-                >
-                  {product.icon}
-                </motion.div>
+                {!isMobile ? (
+                  <motion.div
+                    animate={{ rotate: hovered ? 360 : 0 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl shadow-lg`}
+                  >
+                    {product.icon}
+                  </motion.div>
+                ) : (
+                  <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center text-white text-xl shadow-lg`}>
+                    {product.icon}
+                  </div>
+                )}
 
                 <div className="flex flex-col items-center gap-2 w-full">
                   <div className="flex flex-col items-center gap-2 w-full">
@@ -117,13 +126,19 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
                   )}
                 </div>
 
-                <motion.div
-                  animate={{ x: hovered ? 2 : 0, y: hovered ? -2 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center shadow-lg`}
-                >
-                  <ArrowUpRight className="w-4 h-4 text-white" />
-                </motion.div>
+                {!isMobile ? (
+                  <motion.div
+                    animate={{ x: hovered ? 2 : 0, y: hovered ? -2 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center shadow-lg`}
+                  >
+                    <ArrowUpRight className="w-4 h-4 text-white" />
+                  </motion.div>
+                ) : (
+                  <div className={`w-11 h-11 rounded-3xl bg-gradient-to-br ${product.gradient} flex items-center justify-center shadow-lg`}>
+                    <ArrowUpRight className="w-4 h-4 text-white" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
