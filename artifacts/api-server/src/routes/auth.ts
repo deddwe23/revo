@@ -99,11 +99,12 @@ router.post("/auth/verify-otp", async (req, res) => {
     await pool.query(`UPDATE otp_codes SET used = TRUE WHERE id = $1`, [result.rows[0].id]);
 
     const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     await pool.query(
       `INSERT INTO admin_sessions (token, expires_at) VALUES ($1, $2)`,
-      [token, expiresAt]
+      [tokenHash, expiresAt]
     );
 
     res.cookie("admin_token", token, {
@@ -123,7 +124,8 @@ router.post("/auth/verify-otp", async (req, res) => {
 router.post("/auth/logout", async (req, res) => {
   const token = req.cookies?.admin_token as string | undefined;
   if (token) {
-    await pool.query(`DELETE FROM admin_sessions WHERE token = $1`, [token]);
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    await pool.query(`DELETE FROM admin_sessions WHERE token = $1`, [tokenHash]);
   }
   res.clearCookie("admin_token");
   res.json({ success: true });
@@ -133,9 +135,11 @@ router.get("/auth/me", async (req, res) => {
   const token = req.cookies?.admin_token as string | undefined;
   if (!token) { res.json({ authenticated: false }); return; }
 
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
   const result = await pool.query(
     `SELECT id FROM admin_sessions WHERE token = $1 AND expires_at > NOW()`,
-    [token]
+    [tokenHash]
   );
 
   res.json({ authenticated: result.rows.length > 0 });

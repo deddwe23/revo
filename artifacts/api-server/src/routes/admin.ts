@@ -1,4 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
+import crypto from "crypto";
 import pkg from "pg";
 import { sendOrderStatusEmail } from "../lib/email.js";
 import { runAutomationTrigger } from "../lib/automation.js";
@@ -20,7 +21,8 @@ const ORDER_STATUS_LABELS: Record<string, string> = {
 async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const token = req.cookies?.admin_token as string | undefined;
   if (!token) { res.status(401).json({ error: "غير مصرح" }); return; }
-  const result = await pool.query(`SELECT id FROM admin_sessions WHERE token = $1 AND expires_at > NOW()`, [token]);
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  const result = await pool.query(`SELECT id FROM admin_sessions WHERE token = $1 AND expires_at > NOW()`, [tokenHash]);
   if (result.rows.length === 0) { res.status(401).json({ error: "الجلسة منتهية" }); return; }
   next();
 }

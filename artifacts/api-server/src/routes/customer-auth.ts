@@ -717,11 +717,13 @@ router.get("/customer/me", async (req, res) => {
     return;
   }
 
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
   const result = await pool.query(
     `SELECT c.id, c.email, c.full_name FROM customer_sessions cs
      JOIN customers c ON c.id = cs.customer_id
      WHERE cs.token = $1 AND cs.expires_at > NOW()`,
-    [token],
+    [tokenHash],
   );
 
   if (result.rows.length === 0) {
@@ -736,15 +738,19 @@ router.get("/customer/me", async (req, res) => {
 // Logout
 router.post("/customer/logout", async (req, res) => {
   const token = req.cookies?.customer_token as string | undefined;
-  if (token) await pool.query(`DELETE FROM customer_sessions WHERE token = $1`, [token]);
+  if (token) {
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    await pool.query(`DELETE FROM customer_sessions WHERE token = $1`, [tokenHash]);
+  }
   res.clearCookie("customer_token");
   res.json({ success: true });
 });
 
 async function createSession(customerId: number): Promise<string> {
   const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  await pool.query(`INSERT INTO customer_sessions (customer_id, token, expires_at) VALUES ($1, $2, $3)`, [customerId, token, expiresAt]);
+  await pool.query(`INSERT INTO customer_sessions (customer_id, token, expires_at) VALUES ($1, $2, $3)`, [customerId, tokenHash, expiresAt]);
   return token;
 }
 
