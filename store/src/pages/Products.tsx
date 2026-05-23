@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { Star, Search, Zap, Clock, ArrowUpRight, SlidersHorizontal } from "lucide-react";
@@ -136,9 +136,16 @@ function ServiceCard({ product, index }: { product: (typeof products)[0]; index:
 export default function Products() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [sortBy, setSortBy] = useState("featured");
 
-  const filtered = products
+  // Debounce the search input to avoid filtering on every keystroke
+  useEffect(() => {
+    const id = setTimeout(() => setSearchQuery(searchInput), 220);
+    return () => clearTimeout(id);
+  }, [searchInput]);
+
+  const filtered = useMemo(() => products
     .filter((p) => {
       const matchCat = activeCategory === "all" || p.category === activeCategory;
       const matchSearch =
@@ -150,7 +157,7 @@ export default function Products() {
       if (sortBy === "price-desc") return b.price - a.price;
       if (sortBy === "rating") return b.rating - a.rating;
       return 0;
-    });
+    }), [activeCategory, searchQuery, sortBy]);
 
   return (
     <div className="min-h-screen bg-[#0D0416] relative overflow-x-hidden" dir="rtl">
@@ -249,8 +256,8 @@ export default function Products() {
             <input
               type="text"
               placeholder="ابحث عن خدمة..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pr-10 pl-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-violet-500/5 transition-all"
             />
           </div>
@@ -312,7 +319,7 @@ export default function Products() {
         <AnimatePresence mode="wait">
           {filtered.length > 0 ? (
             <motion.div
-              key={`${activeCategory}-${searchQuery}`}
+              key={activeCategory}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

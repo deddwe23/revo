@@ -73,6 +73,18 @@ function SidebarProvider({
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
+  // Helper: set a safe cookie with encoding and SameSite. Adds Secure when served over HTTPS.
+  const setCookie = React.useCallback((name: string, value: string, maxAge: number) => {
+    try {
+      const encoded = encodeURIComponent(value)
+      const sameSite = "; SameSite=Lax"
+      const secure = typeof window !== "undefined" && window.location?.protocol === "https:" ? "; Secure" : ""
+      document.cookie = `${name}=${encoded}; path=/; max-age=${maxAge}${sameSite}${secure}`
+    } catch (e) {
+      // swallow cookie errors (e.g., when document isn't available)
+    }
+  }, [])
+
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === "function" ? value(open) : value
@@ -82,10 +94,10 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      // Persist sidebar state safely in a cookie
+      setCookie(SIDEBAR_COOKIE_NAME, String(openState), SIDEBAR_COOKIE_MAX_AGE)
     },
-    [setOpenProp, open]
+    [setOpenProp, open, setCookie]
   )
 
   // Helper to toggle the sidebar.

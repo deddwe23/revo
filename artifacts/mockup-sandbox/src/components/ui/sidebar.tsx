@@ -71,6 +71,15 @@ function SidebarProvider({
 
   const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
+  const setCookie = React.useCallback((name: string, value: string, maxAge: number) => {
+    try {
+      const encoded = encodeURIComponent(value)
+      const sameSite = "; SameSite=Lax"
+      const secure = typeof window !== "undefined" && window.location?.protocol === "https:" ? "; Secure" : ""
+      document.cookie = `${name}=${encoded}; path=/; max-age=${maxAge}${sameSite}${secure}`
+    } catch (e) {}
+  }, [])
+
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === "function" ? value(open) : value
@@ -80,9 +89,9 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      setCookie(SIDEBAR_COOKIE_NAME, String(openState), SIDEBAR_COOKIE_MAX_AGE)
     },
-    [setOpenProp, open]
+    [setOpenProp, open, setCookie]
   )
 
   const toggleSidebar = React.useCallback(() => {
