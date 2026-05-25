@@ -191,6 +191,7 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [savingProduct, setSavingProduct] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
@@ -243,12 +244,25 @@ export default function AdminDashboard() {
   };
 
   const checkAuth = async () => {
-    const res = await fetch(`${BASE}/api/auth/me`, { credentials: "include" });
-    const data = await res.json() as { authenticated: boolean };
-    if (!data.authenticated) navigate("/admin");
+    try {
+      const res = await fetch(`${BASE}/api/auth/me`, { credentials: "include" });
+      if (res.status === 401) {
+        navigate("/admin");
+        return false;
+      }
+      const data = await res.json() as { authenticated: boolean };
+      if (!data.authenticated) {
+        navigate("/admin");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      throw new Error("تعذر الاتصال بخادم المصادقة. تأكد من تشغيل backend ثم أعد المحاولة.");
+    }
   };
 
   const fetchData = async () => {
+    setError(null);
     setLoading(true);
     try {
       const [ordersRes, statsRes, customersRes, productsRes, couponsRes, settingsRes, contentRes] = await Promise.all([
@@ -276,12 +290,24 @@ export default function AdminDashboard() {
       setSettings(settingsData.settings);
       setHomeContent(contentData?.content ?? null);
       setContentDraft(normalizeHomeContent(contentData?.content?.value));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "تعذر تحميل بيانات لوحة التحكم. تأكد من تشغيل الخلفية ثم أعد المحاولة.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { void checkAuth().then(fetchData); }, []);
+  useEffect(() => {
+    void (async () => {
+      try {
+        const authenticated = await checkAuth();
+        if (authenticated) await fetchData();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "تعذر الاتصال بخادم لوحة التحكم.");
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const handleStatusUpdate = async (orderId: number, newStatus: OrderStatus) => {
     setUpdatingId(orderId);
@@ -908,6 +934,22 @@ export default function AdminDashboard() {
       );
     }).slice(0, 5);
   }, [normalizedSearch, products]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4" dir="rtl">
+        <div className="glass-panel border border-white/10 rounded-3xl p-8 max-w-2xl text-center">
+          <p className="text-sm text-white/50 mb-4">تعذر تحميل لوحة التحكم</p>
+          <h1 className="text-2xl font-bold text-white mb-3">{error}</h1>
+          <p className="text-white/40 mb-6">تأكد من تشغيل الخلفية والواجهة معًا عبر الأمر <code className="bg-white/5 px-2 py-1 rounded">pnpm dev</code>.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button onClick={fetchData} variant="outline" className="border-white/10 text-white/80">إعادة المحاولة</Button>
+            <Button onClick={() => navigate('/admin')} variant="secondary" className="text-white">العودة إلى صفحة الدخول</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">

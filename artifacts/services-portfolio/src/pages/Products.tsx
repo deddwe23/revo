@@ -18,16 +18,14 @@ const ServiceCard = memo(function ServiceCard({
 }) {
   return (
     <div className="h-full">
-      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[hsl(270,50%,7%)] overflow-hidden shadow-2xl shadow-black/20 transition-transform duration-300 hover:-translate-y-1">
+      <div className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-card overflow-hidden shadow-xl shadow-black/15 transition-transform duration-300 hover:-translate-y-1">
         <div className="group flex-1 flex flex-col">
           <Link
             href={`/products/${product.id}`}
             className="group flex-1 flex flex-col no-underline"
             aria-label={`عرض تفاصيل ${product.name}`}
           >
-            <div
-              className={`relative aspect-square w-full bg-gradient-to-br ${product.gradient} flex items-center justify-center text-5xl text-white`}
-            >
+            <div className="relative aspect-square w-full bg-gradient-to-br from-primary/80 to-secondary/80 flex items-center justify-center text-5xl text-white">
               <span className="text-6xl">{product.icon}</span>
             </div>
 
@@ -56,7 +54,7 @@ const ServiceCard = memo(function ServiceCard({
           </Link>
         </div>
 
-        <div className="p-5 border-t border-white/10 bg-[hsl(270,52%,9%)]">
+        <div className="p-5 border-t border-white/10 bg-card">
           <button
             type="button"
             onClick={(e) => onAddToCart(product, e)}
@@ -142,15 +140,12 @@ export default function Products() {
   );
 
   return (
-    <div
-      className="min-h-screen bg-[#0D0416] relative overflow-x-hidden"
-      dir="rtl"
-    >
+    <div className="min-h-screen bg-background relative overflow-x-hidden" dir="rtl">
       {!isMobile && (
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-blue-600/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-violet-700/8 rounded-full blur-3xl" />
+          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 right-[-5%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 left-[-5%] w-56 h-56 bg-primary/10 rounded-full blur-3xl" />
           <div
             className="absolute inset-0 opacity-[0.02]"
             style={{
@@ -174,13 +169,13 @@ export default function Products() {
             <span className="text-white/40 text-xs">صفحة المنتجات</span>
           </div>
 
-          <p className="text-violet-400 text-xs font-mono uppercase mb-3 tracking-[0.35em]">
+          <p className="text-secondary text-xs font-mono uppercase mb-3 tracking-[0.35em]">
             Digital Services
           </p>
 
           <h1 className="text-white font-black text-3xl sm:text-5xl tracking-tight mb-4 leading-tight">
             خدماتنا{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-blue-400 to-violet-300 bg-clip-text text-transparent">
+            <span className="gradient-text">
               الرقمية
             </span>
           </h1>
@@ -207,9 +202,7 @@ export default function Products() {
 
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60" />
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        </div>
+          <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
 
         <div className={`flex flex-col ${isMobile ? "gap-3" : "gap-3"} mb-5 max-w-2xl mx-auto ${isMobile ? "px-0" : ""}`}>
           <div className="relative flex-1">
@@ -219,7 +212,7 @@ export default function Products() {
               placeholder="ابحث عن خدمة..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pr-10 pl-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-violet-500/40 focus:bg-violet-500/5 transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl pr-10 pl-4 py-3 text-white text-sm placeholder:text-white/20 outline-none focus:border-primary/40 focus:bg-white/10 transition-all"
             />
           </div>
           <div className={`relative ${isMobile ? "w-full" : ""}`}>
@@ -227,7 +220,7 @@ export default function Products() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl pr-9 pl-3 py-3 text-white/60 text-sm outline-none focus:border-violet-500/40 transition-all cursor-pointer appearance-none min-w-[110px]"
+              className="bg-white/5 border border-white/10 rounded-xl pr-9 pl-3 py-3 text-white/60 text-sm outline-none focus:border-primary/40 transition-all cursor-pointer appearance-none min-w-[110px]"
             >
               <option value="featured" className="bg-gray-900">
                 الأشهر
@@ -252,12 +245,12 @@ export default function Products() {
               onClick={() => setActiveCategory(cat.id)}
               className={`relative px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${
                 activeCategory === cat.id
-                  ? "border-violet-500/50 text-violet-300 bg-violet-500/10"
+                  ? "border-primary/50 text-primary bg-primary/10"
                   : "border-white/8 text-white/35 hover:border-white/18 hover:text-white/55"
               }`}
             >
               {activeCategory === cat.id && (
-                <div className="absolute inset-0 rounded-full bg-violet-500/10" />
+                <div className="absolute inset-0 rounded-full bg-primary/10" />
               )}
               <span className="relative">{cat.label}</span>
             </button>
@@ -273,7 +266,7 @@ export default function Products() {
         </p>
 
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {filtered.map((product, i) => (
               <ServiceCard
                 key={product.id}
@@ -291,7 +284,7 @@ export default function Products() {
                 setActiveCategory("all");
                 setSearchQuery("");
               }}
-              className="mt-4 text-violet-400/60 hover:text-violet-400 text-xs font-mono transition-colors"
+              className="mt-4 text-secondary/60 hover:text-secondary text-xs font-mono transition-colors"
             >
               مسح الفلاتر
             </button>
@@ -301,9 +294,9 @@ export default function Products() {
         <div className="mt-20 text-center">
           <div className="inline-block relative">
             {!isMobile && (
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-blue-500/20 to-violet-600/20 rounded-2xl blur-xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 rounded-2xl blur-xl" />
             )}
-            <div className="relative bg-white/5 border border-white/10 rounded-2xl px-8 py-8">
+            <div className="relative glass-panel border border-white/10 rounded-2xl px-8 py-8">
               <p className="text-white/40 text-xs font-mono mb-2 tracking-widest uppercase">
                 خدمة مخصصة
               </p>
@@ -315,7 +308,7 @@ export default function Products() {
               </p>
               <button
                 type="button"
-                className="px-7 py-3 bg-gradient-to-r from-violet-600 to-blue-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-violet-600/30 transition-transform duration-200 hover:scale-[1.02]"
+                className="px-7 py-3 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl text-sm shadow-lg shadow-primary/30 transition-transform duration-200 hover:scale-[1.02]"
               >
                 تواصل معنا مباشرة
               </button>
