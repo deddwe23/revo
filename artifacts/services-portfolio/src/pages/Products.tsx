@@ -203,6 +203,7 @@ export default function Products() {
         <div className="flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+        </div>
 
         <div className={`flex flex-col ${isMobile ? "gap-3" : "gap-3"} mb-5 max-w-2xl mx-auto ${isMobile ? "px-0" : ""}`}>
           <div className="relative flex-1">

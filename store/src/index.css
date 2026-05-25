@@ -311,42 +311,4 @@
   }
 }
 
-/* Desktop-specific: enlarge text/images and make sections cover full viewport */
-@media (min-width: 1024px) {
-  :root {
-    font-size: 18px;
-  }
 
-  body {
-    font-size: 1.125rem;
-    line-height: 1.5;
-  }
-
-  #root, .app, main, .page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 1600px;
-    padding: 2.5rem;
-    margin-inline: auto;
-  }
-
-  img, .hero-image, .cover-image {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    object-fit: cover;
-    display: block;
-  }
-
-  h1 { font-size: 2.5rem; }
-  h2 { font-size: 2rem; }
-  h3 { font-size: 1.5rem; }
-  p, .text { font-size: 1.125rem; }
-}
