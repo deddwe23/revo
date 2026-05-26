@@ -615,7 +615,7 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
               variants={stagger}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
             >
               {homeContent.services.map((service, idx) => {
                 const serviceIcons = [LayoutTemplate, Smartphone, ShoppingCart, Database, Code2, Lightbulb];
@@ -864,7 +864,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div
-                className="grid grid-cols-2 gap-6"
+                className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6"
                 initial={{ opacity: 0, x: -60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -931,7 +931,7 @@ export default function Home() {
             {ratings.length > 0 ? (
               <RatingsCarousel ratings={ratings} autoplay={true} autoplayDelay={5000} />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
                 {([
                   { name: "أحمد الشمري", role: "صاحب متجر إلكتروني", text: "تجربة استثنائية! التطبيق اكتمل في الوقت المحدد وبجودة تفوق توقعاتي. التواصل كان سلساً وسريع الاستجابة طوال مدة المشروع.", stars: 5 },
                   { name: "نورة القحطاني", role: "مؤسسة شركة ناشئة", text: "أنجز لي متجراً متكاملاً بواجهة احترافية وأنظمة دفع موثوقة. النتيجة جاوزت التوقعات ومبيعاتي ارتفعت بشكل ملحوظ.", stars: 5 },

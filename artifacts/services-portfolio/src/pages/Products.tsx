@@ -25,24 +25,24 @@ const ServiceCard = memo(function ServiceCard({
             className="group flex-1 flex flex-col no-underline"
             aria-label={`عرض تفاصيل ${product.name}`}
           >
-            <div className="relative aspect-square w-full bg-gradient-to-br from-primary/80 to-secondary/80 flex items-center justify-center text-5xl text-white">
-              <span className="text-6xl">{product.icon}</span>
+            <div className="relative aspect-square w-full bg-gradient-to-br from-primary/80 to-secondary/80 flex items-center justify-center text-4xl sm:text-5xl text-white">
+              <span className="text-5xl sm:text-6xl">{product.icon}</span>
             </div>
 
             <div className="px-5 py-6 flex flex-col gap-3 flex-1">
               <div>
-                <h3 className="text-white font-black text-lg leading-tight mb-1">
+                <h3 className="text-white font-black text-base sm:text-lg leading-tight mb-1 truncate">
                   {product.name}
                 </h3>
-                <p className="text-white/40 text-xs">{product.nameEn}</p>
+                <p className="text-white/40 text-[10px] sm:text-xs truncate">{product.nameEn}</p>
               </div>
 
               <div className="mt-auto">
                 <div className="flex items-end gap-2">
-                  <span className="text-2xl font-black text-white">
+                  <span className="text-xl sm:text-2xl font-black text-white">
                     {product.price.toLocaleString("ar")}
                   </span>
-                  <span className="text-white/40 text-xs">ر.س</span>
+                  <span className="text-white/40 text-[10px] sm:text-xs">ر.س</span>
                 </div>
                 {product.originalPrice && (
                   <p className="text-white/25 text-xs line-through mt-1">
@@ -267,7 +267,7 @@ export default function Products() {
         </p>
 
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-6">
             {filtered.map((product, i) => (
               <ServiceCard
                 key={product.id}
