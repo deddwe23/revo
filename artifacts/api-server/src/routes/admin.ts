@@ -2,6 +2,7 @@ import { Router, type Request, type Response, type NextFunction } from "express"
 import crypto from "crypto";
 import pkg from "pg";
 import { sendOrderStatusEmail } from "../lib/email.js";
+import { logger } from "../lib/logger.js";
 import { runAutomationTrigger } from "../lib/automation.js";
 
 const { Pool } = pkg;
@@ -536,7 +537,7 @@ router.delete("/admin/orders/:id", requireAdmin, async (req, res) => {
     res.json({ success: true, message: "تم حذف الطلب بنجاح" });
   } catch (error) {
     await pool.query(`ROLLBACK`);
-    console.error("Error deleting order:", error);
+    logger.error(error, "deleting order:");
     res.status(500).json({ error: "خطأ في حذف الطلب" });
   }
 });
@@ -558,7 +559,7 @@ router.delete("/admin/orders", requireAdmin, async (req, res) => {
     res.json({ success: true, message: `تم حذف ${result.rowCount} طلب بنجاح` });
   } catch (error) {
     await pool.query(`ROLLBACK`);
-    console.error("Error deleting all orders:", error);
+    logger.error(error, "deleting all orders:");
     res.status(500).json({ error: "خطأ في حذف جميع الطلبات" });
   }
 });
@@ -640,7 +641,7 @@ router.delete("/admin/customers/:id", requireAdmin, async (req, res) => {
 
     res.json({ success: true, message: "تم حذف العميل بنجاح" });
   } catch (error) {
-    console.error("Error deleting customer:", error);
+    logger.error(error, "deleting customer:");
     res.status(500).json({ error: "خطأ في حذف العميل" });
   }
 });
@@ -657,7 +658,7 @@ router.delete("/admin/customers", requireAdmin, async (req, res) => {
     const result = await pool.query(`DELETE FROM customers`);
     res.json({ success: true, message: `تم حذف ${result.rowCount} عميل بنجاح` });
   } catch (error) {
-    console.error("Error deleting all customers:", error);
+    logger.error(error, "deleting all customers:");
     res.status(500).json({ error: "خطأ في حذف جميع العملاء" });
   }
 });
@@ -680,7 +681,7 @@ router.delete("/admin/products/:id", requireAdmin, async (req, res) => {
 
     res.json({ success: true, message: "تم حذف المنتج بنجاح" });
   } catch (error) {
-    console.error("Error deleting product:", error);
+    logger.error(error, "deleting product:");
     res.status(500).json({ error: "خطأ في حذف المنتج" });
   }
 });
@@ -697,7 +698,7 @@ router.delete("/admin/products", requireAdmin, async (req, res) => {
     const result = await pool.query(`DELETE FROM products`);
     res.json({ success: true, message: `تم حذف ${result.rowCount} منتج بنجاح` });
   } catch (error) {
-    console.error("Error deleting all products:", error);
+    logger.error(error, "deleting all products:");
     res.status(500).json({ error: "خطأ في حذف جميع المنتجات" });
   }
 });

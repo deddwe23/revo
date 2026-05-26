@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import pkg from "pg";
 import { sendOrderNotification, type OrderNotificationItem } from "../lib/email.js";
+import { logger } from "../lib/logger.js";
 import { runAutomationTrigger } from "../lib/automation.js";
 
 const { Pool } = pkg;
@@ -239,7 +240,7 @@ router.post("/orders", upload.single("receipt"), async (req, res) => {
     } catch {
       // Ignore rollback errors.
     }
-    console.error("Order error:", err);
+    logger.error(err, "Order error");
     res.status(500).json({ error: "حدث خطأ" });
   } finally {
     client.release();

@@ -11,6 +11,32 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+// Validate required environment variables
+function validateEnvironmentVariables(): void {
+  const required = ["DATABASE_URL"];
+  const missing: string[] = [];
+
+  for (const envVar of required) {
+    if (!process.env[envVar]) {
+      missing.push(envVar);
+    }
+  }
+
+  if (missing.length > 0) {
+    const error = `Missing required environment variables: ${missing.join(", ")}`;
+    logger.error({ missing }, error);
+    throw new Error(error);
+  }
+
+  // Warn about optional but recommended variables
+  const optional = ["ADMIN_EMAIL", "ADMIN_LOGIN_PHONE"];
+  for (const envVar of optional) {
+    if (!process.env[envVar]) {
+      logger.warn({ envVar }, `Optional environment variable not set: ${envVar}`);
+    }
+  }
+}
+
 async function listenWithPortFallback(initialPort: number, maxAttempts = 5) {
   let candidatePort = initialPort;
 
@@ -49,6 +75,7 @@ async function listenWithPortFallback(initialPort: number, maxAttempts = 5) {
 
 void (async () => {
   try {
+    validateEnvironmentVariables();
     await bootstrapDatabase();
 
     const actualPort = await listenWithPortFallback(port);

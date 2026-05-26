@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import pkg from "pg";
 import { isEmailConfigured, sendCustomerLoginCodeEmail } from "../lib/email.js";
+import { logger } from "../lib/logger.js";
 import { runAutomationTrigger } from "../lib/automation.js";
 import { normalizeSaudiPhone, sendOtpViaWhatsApp } from "../lib/whatsapp-otp.js";
 
@@ -281,7 +282,7 @@ router.post("/customer/register/send-email-code", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -311,7 +312,7 @@ router.post("/customer/register/verify-email-code", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -369,7 +370,7 @@ router.post("/customer/register/send-whatsapp-code", async (req, res) => {
 
     res.json({ success: true, channel: sent.mode });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -406,7 +407,7 @@ router.post("/customer/register/verify-whatsapp-code", async (req, res) => {
     const verificationToken = createRegisterVerificationToken(state.phone);
     res.json({ success: true, verificationToken });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -474,7 +475,7 @@ router.post("/customer/register", async (req, res) => {
 
     res.json({ success: true, customer: { id: customer.id, email: customer.email, fullName: customer.full_name } });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -511,7 +512,7 @@ router.post("/customer/login", async (req, res) => {
     });
     res.json({ success: true, customer: { id: customer.id, email: customer.email, fullName: customer.full_name } });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -555,7 +556,7 @@ router.post("/customer/send-login-code", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -606,7 +607,7 @@ router.post("/customer/send-login-whatsapp-code", async (req, res) => {
 
     res.json({ success: true, channel: sent.mode });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -655,7 +656,7 @@ router.post("/customer/verify-login-whatsapp-code", async (req, res) => {
     });
     res.json({ success: true, customer: { id: customer.id, email: customer.email, fullName: customer.full_name } });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });
@@ -704,7 +705,7 @@ router.post("/customer/verify-login-code", async (req, res) => {
     });
     res.json({ success: true, customer: { id: customer.id, email: customer.email, fullName: customer.full_name } });
   } catch (err) {
-    console.error(err);
+    logger.error(err, "Customer auth error");
     res.status(500).json({ error: "حدث خطأ" });
   }
 });

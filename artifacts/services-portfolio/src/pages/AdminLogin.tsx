@@ -63,8 +63,14 @@ export default function AdminLogin() {
           credentials: "include",
         },
       );
+      
+      if (!res.ok) {
+        const data = await readJsonResponse<{ success?: boolean; error?: string }>(res);
+        throw new Error(data.error || "فشل إرسال الكود");
+      }
+      
       const data = await readJsonResponse<{ success: boolean; error?: string }>(res);
-      if (!res.ok) throw new Error(data.error || "حدث خطأ");
+      if (!data.success) throw new Error(data.error || "حدث خطأ");
 
       setSentTo(useEmailLogin ? email : adminPhone);
       toast({

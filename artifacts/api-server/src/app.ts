@@ -18,8 +18,8 @@ const rateLimitMiddleware = (
   max = RATE_LIMIT_MAX,
   windowMs = RATE_LIMIT_WINDOW,
   keyPrefix = "global",
-) => (req: any, res: any, next: any) => {
-  const ip = req.ip || req.connection.remoteAddress;
+) => (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+  const ip = (req.ip || (req.socket?.remoteAddress as string | undefined)) ?? "unknown";
   const key = `${keyPrefix}:${ip}`;
   const now = Date.now();
   
@@ -112,14 +112,14 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Input validation and sanitization middleware
-app.use((req, res, next) => {
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (req.body && typeof req.body === "object") {
     // Sanitize object values
-    const sanitize = (obj: any): any => {
-      if (typeof obj !== "object" || obj === null) return obj;
-      if (Array.isArray(obj)) return obj.map(sanitize);
+    const sanitize = (obj: Record<string, unknown>): Record<string, unknown> => {
+      if (typeof obj !== "object" || obj === null) return obj as Record<string, unknown>;
+      if (Array.isArray(obj)) return obj.map(item => sanitize(item as Record<string, unknown>)) as unknown as Record<string, unknown>;
       
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(obj)) {
         // Prevent prototype pollution
         if (key === "__proto__" || key === "constructor" || key === "prototype") {
@@ -132,7 +132,7 @@ app.use((req, res, next) => {
             .replace(/[<>]/g, "") // Remove angle brackets
             .trim();
         } else {
-          sanitized[key] = sanitize(value);
+          sanitized[key] = sanitize(value as Record<string, unknown>);
         }
       }
       return sanitized;
@@ -176,7 +176,7 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err: any, req: any, res: any, next: any) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error({ error: err, path: req.path, method: req.method }, "Request error");
   
   if (err.message === "Not allowed by CORS") {

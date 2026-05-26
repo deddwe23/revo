@@ -2,6 +2,7 @@ import { Router } from "express";
 import crypto from "crypto";
 import pkg from "pg";
 import { isEmailConfigured, sendOtpEmail } from "../lib/email.js";
+import { logger } from "../lib/logger.js";
 import { normalizeSaudiPhone, sendOtpViaWhatsApp } from "../lib/whatsapp-otp.js";
 
 const { Pool } = pkg;
@@ -44,7 +45,7 @@ router.post("/auth/send-otp", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error("OTP error:", err);
+    logger.error(err, "OTP error");
     res.status(500).json({ error: "حدث خطأ في إرسال الكود" });
   }
 });
@@ -72,7 +73,7 @@ router.post("/auth/send-whatsapp-otp", async (req, res) => {
     await pool.query(`INSERT INTO otp_codes (code, expires_at) VALUES ($1, $2)`, [otp, expiresAt]);
     res.json({ success: true, channel: sent.mode, phone: requestedPhone });
   } catch (err) {
-    console.error("WhatsApp admin OTP error:", err);
+    logger.error(err, "WhatsApp admin OTP error");
     res.status(500).json({ error: "حدث خطأ في إرسال الكود على واتساب" });
   }
 });
